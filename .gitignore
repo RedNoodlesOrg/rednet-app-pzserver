@@ -1,0 +1,6 @@
+# Local runtime config — contains the Steam Web API key.
+# Use pzsm/config.example.yaml as the committed template.
+/pzsm/config.yaml
+
+# Live PZ server config; may contain RCON / admin passwords.
+/servertest.ini

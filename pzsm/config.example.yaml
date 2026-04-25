@@ -1,0 +1,24 @@
+# Copy this file to ./pzsm/config.yaml and fill in REPLACE_ME values.
+# config.yaml is gitignored so secrets stay local.
+
+listen_addr: ":8080"
+
+# SQLite path inside the container (matches the named-volume mount).
+database_path: /var/lib/pzsm/pzsm.db
+
+# Required: Steam Web API key. Get one at https://steamcommunity.com/dev/apikey
+steam_web_api_key: REPLACE_ME
+
+# Optional: workshop collection synced into the mods table.
+steam_collection_id: ""
+
+# Path inside the container; the parent dir is bind-mounted from ./
+servertest_ini: /var/lib/pzserver-config/servertest.ini
+
+# RCON / docker fields are aspirational (Slice 4 in pzsm/NEXT.md).
+# Loaded but unused by today's pzsm binary.
+rcon_host: pzserver
+rcon_port: "27015"
+rcon_password: ""
+docker_container: pzserver
+docker_socket: unix:///var/run/docker.sock

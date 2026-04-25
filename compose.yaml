@@ -1,0 +1,53 @@
+services:
+  pzserver:
+    build: .
+    image: localhost/pzserver:latest
+    container_name: pzserver
+    restart: unless-stopped
+    stop_grace_period: 60s
+    ports:
+      - "16261:16261/udp"
+      - "16262:16262/udp"
+      - "27015:27015/tcp"
+    volumes:
+      - pz-zomboid:/home/steam/Zomboid
+      - pz-steamapps:/opt/pzserver/steamapps
+      - ./servertest.ini:/home/steam/Zomboid/Server/servertest.ini:ro,Z
+    # Uncomment and tune for your player count / mod load:
+    # mem_limit: 4g
+
+  pzsm:
+    build:
+      context: ../pzsm
+      dockerfile: Dockerfile
+    image: localhost/pzsm:latest
+    container_name: pzsm
+    restart: unless-stopped
+    stop_grace_period: 10s
+    depends_on:
+      - pzserver
+    expose:
+      - "8080"
+    volumes:
+      - ./pzsm/config.yaml:/etc/pzsm/config.yaml:ro,Z
+      - pzsm-data:/var/lib/pzsm
+      # Bind-mount the parent directory of servertest.ini so atomic temp+rename
+      # writes inside pzsm work without crossing a mount boundary.
+      - ./:/var/lib/pzserver-config:rw,Z
+
+  pzsmui:
+    build:
+      context: ../pzsmui
+      dockerfile: Dockerfile
+    image: localhost/pzsmui:latest
+    container_name: pzsmui
+    restart: unless-stopped
+    depends_on:
+      - pzsm
+    expose:
+      - "80"
+
+volumes:
+  pz-zomboid:
+  pz-steamapps:
+  pzsm-data:
