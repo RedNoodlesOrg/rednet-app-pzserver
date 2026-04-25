@@ -13,8 +13,16 @@ services:
       - pz-zomboid:/home/steam/Zomboid
       - pz-steamapps:/opt/pzserver/steamapps
       - ./servertest.ini:/home/steam/Zomboid/Server/servertest.ini:ro,Z
-    # Uncomment and tune for your player count / mod load:
-    # mem_limit: 4g
+    # Resource priority — pzserver wins under contention.
+    # cpu_shares is a relative weight (default 1024); only matters when CPU is
+    # contested, no effect on an idle host. mem_reservation is the soft floor
+    # the kernel protects under memory pressure. mem_limit is the hard cap;
+    # tune to ~70% of host RAM minus the small caps below. oom_score_adj
+    # biases the OOM killer away from this container.
+    cpu_shares: 4096
+    mem_reservation: 2g
+    mem_limit: 4g
+    oom_score_adj: -500
 
   pzsm:
     build:
@@ -34,6 +42,9 @@ services:
       # Bind-mount the parent directory of servertest.ini so atomic temp+rename
       # writes inside pzsm work without crossing a mount boundary.
       - ./:/var/lib/pzserver-config:rw,Z
+    cpu_shares: 256
+    mem_limit: 256m
+    oom_score_adj: 500
 
   pzsmui:
     build:
@@ -46,6 +57,9 @@ services:
       - pzsm
     expose:
       - "80"
+    cpu_shares: 256
+    mem_limit: 128m
+    oom_score_adj: 500
 
 volumes:
   pz-zomboid:
